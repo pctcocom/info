@@ -124,6 +124,26 @@ if( $agent->getBrowser() == HttpUserAgent::BROWSER_FIREFOX && $agent->getVersion
 
 
 ## IP
+* https://www.ipip.net/
 ```
-123
+use Pctco\Info\Ip\Ip;
+```
+|Function|Note|return|
+|:-|:-|
+|::range('192.168.0.100',['192.168.0.1','192.168.5.255'])|判断ip是否在范围内|Bool|
+|::IPSegmentCompared(['192.168.0.4','192.168.4.25'],['192.168.0.4','192.168.5.255'])|判断两个IP段是否之间有相同的值|Bool|
+|::segment(['192.168.0.100','192.168.0.255'])|判断IP段是否是正确，开始和结束是否合法|Bool|
+|::ipToInt('192.168.0.1')|计算IP转整数|Int|
+|::check('127.0.0.1')|IP格式验证|Bool|
+
+```
+/**
+* @name Home Address
+* @describe 归属地址
+* @param mixed $ip 1.1.1.1
+* @param mixed $net 使用那个网络的数据库  [ipip.net]
+* @param mixed $spacer 间隔符
+* @return
+**/
+Ip::HomeAddress('125.79.224.56','ipip.net','/');
 ```

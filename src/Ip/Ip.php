@@ -1,19 +1,36 @@
 <?php
-namespace Pctco\Info;
+namespace Pctco\Info\Ip;
+use Pctco\Info\Ip\Ipipnet\Ipipnet;
  /**
  * @name Ip
  **/
 class Ip{
    /**
+   * @name Home Address
+   * @describe 归属地址
+   * @param mixed $ip 1.1.1.1
+   * @param mixed $net 使用那个网络的数据库  [ipip.net]
+   * @param mixed $spacer 间隔符
+   * @return
+   **/
+   public static function HomeAddress($ip,$net,$spacer = '-'){
+      if ($net === 'ipip.net') {
+         $arr = array_filter(array_unique(Ipipnet::find($ip)));
+         $re = implode($spacer,$arr);
+         return $re;
+      }
+   }
+
+   /**
    * @name range
    * @describe 判断ip是否在范围内
-   * @param string $ip 0.0.0.0
-   * @param array $IPSegment [192.168.0.1,192,168,5,255]
+   * @param string $ip 192.168.0.100
+   * @param array $IPSegment ['192.168.0.1','192.168.5.255']
    * @return Bool
    **/
    public static function range($ip,$IPSegment){
       $result = false;
-      if (self::format($ip) && self::format($IPSegment[0]) && self::format($IPSegment[1])) {
+      if (self::check($ip) && self::check($IPSegment[0]) && self::check($IPSegment[1])) {
          $ip = self::ipToInt($ip);
          $start = self::ipToInt($IPSegment[0]);
          $end = self::ipToInt($IPSegment[1]);
@@ -25,15 +42,15 @@ class Ip{
       return $result;
    }
    /**
-   * @name ABrange
+   * @name IP Segment Compared
    * @describe 判断两个IP段是否之间有相同的值
-   * @param mixed $IPASegment [192.168.0.1,192,168,5,25]
-   * @param mixed $IPBSegment [192.168.0.4,192,168,5,255]  $post的值
+   * @param mixed $IPASegment [192.168.0.1,192.168.5.25]
+   * @param mixed $IPBSegment [192.168.0.4,192.168.5.255]  $post的值
    * @return Bool
    **/
-   public static function ABrange($IPASegment,$IPBSegment){
-      $result = false; // 没有重负
-      if (self::format($IPASegment) && self::format($IPBSegment)) {
+   public static function IPSegmentCompared($IPASegment,$IPBSegment){
+      $result = false; // 没有相同的值
+      if (self::check($IPASegment) && self::check($IPBSegment)) {
          $a1 = explode('.',$IPASegment[0]);
          $a2 = explode('.',$IPASegment[1]);
          $b1 = explode('.',$IPBSegment[0]);
@@ -66,28 +83,24 @@ class Ip{
    * @return Bool
    **/
    public static function segment($IPSegment){
-      $result = false;
-      if (self::format($IPSegment[0]) && self::format($IPSegment[1])) {
-         $start = Judge::ipToInt($IPSegment[0]);
-         $end = Judge::ipToInt($IPSegment[1]);
+      $result = true;
+      if (self::check($IPSegment[0]) && self::check($IPSegment[1])) {
+         $start = self::ipToInt($IPSegment[0]);
+         $end = self::ipToInt($IPSegment[1]);
 
-         if ($start>=$end) {
-            $result = true; // 不合法IP段
+         if ($start >= $end) {
+            $result = false; // 不合法IP段
          }
       }
       return $result;
    }
    /**
    * @name ipToInt
-   * @describe IP转整数
+   * @describe 计算IP转整数
    * @param string $ip 0.0.0.0
-   * @param string $segment 1(段),2(段),3(段),4(段) 返回那几段  [1,3]
    * @return Int
    **/
-   public static function ipToInt($ip,$segment = 0){
-      if ($segment == 0) {
-         $segment = [0,1,2,3];
-      }
+   public static function ipToInt($ip){
       $ip = explode('.',$ip);
       $n = [
          $ip[0]*256*256*256,
@@ -96,38 +109,28 @@ class Ip{
          $ip[3]
       ];
       $int = 0;
-      foreach ($segment as $v) {
+      foreach ([0,1,2,3] as $v) {
          $int = $int+$n[$v];
       }
       return $int;
    }
    /**
-   * @name format
-   * @describe IP格式验证
+   * @name check
+   * @describe IP格式验证 验证成功 则返回 ip地址 , 失败则返回 false
    * @param string $ip 0.0.0.0
    * @return
    **/
-   public static function format($ip){
-      $result = false;
-      if (!empty($ip)) {
-         $validate = new \think\Validate(
-            ['ip' => 'ip']
-         );
-         if (is_array($ip)) {
-            foreach ($ip as $ips) {
-               if (empty($ips)) {
-                  $result = false;
-               }else{
-                  $result = $validate->check(['ip'=>$ips]);
-               }
-               if ($result) {
-                  break;
-               }
+   public static function check($ip){
+      // 验证[1.1.1.1,2.2.2.2]
+      if (is_array($ip)) {
+         foreach ($ip as $v) {
+            if (filter_var($v, FILTER_VALIDATE_IP) === false) {
+               return false;
             }
-         }else{
-            $result = $validate->check(['ip'=>$ip]);
          }
+         return true;
       }
-      return $result;
+      // 验证1.1.1.1
+      return filter_var($ip, FILTER_VALIDATE_IP) !== false?true:false;
    }
 }

@@ -121,3 +121,9 @@ if( $agent->getBrowser() == HttpUserAgent::BROWSER_FIREFOX && $agent->getVersion
 |PLATFORM_JAVA_ANDROID|"Java/Android"|
 |PLATFORM_POSTMAN|"Postman"|
 |PLATFORM_I_FRAME|"Iframely"|
+
+
+## IP
+```
+123
+```

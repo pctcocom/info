@@ -13,7 +13,7 @@ class Ip{
    * @param mixed $spacer 间隔符
    * @return
    **/
-   public static function HomeAddress($ip,$net,$spacer = '-'){
+   public static function HomeAddress($ip,$net = 'ipip.net',$spacer = '-'){
       if ($net === 'ipip.net') {
          $arr = array_filter(array_unique(Ipipnet::find($ip)));
          $re = implode($spacer,$arr);

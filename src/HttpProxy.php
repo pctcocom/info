@@ -1,6 +1,6 @@
 <?php
 namespace Pctco\Info;
-use app\Model\Temporary;
+use app\model\Temporary;
 use think\facade\Log;
 use Pctco\Types\Arrays;
 class HttpProxy{

@@ -2,15 +2,23 @@
 namespace Pctco\Info;
 use app\Model\Temporary;
 use think\facade\Log;
+use Pctco\Types\Arrays;
 class HttpProxy{
     function __construct(){
         $this->temporary = new Temporary;
     }
 
-    public function get(){
+    public function get($options = []){
+        $options = Arrays::merge([],[
+            'where'  => [
+                'type'  =>  'httpproxy',
+                'n5'    =>  86
+            ]
+        ],$options);
+        
         $ip = 
         $this->temporary
-        ->where('type','httpproxy')
+        ->where($options['where'])
         ->order('timers')
         ->find();
 
@@ -38,7 +46,8 @@ class HttpProxy{
             ]);
             return $ip->toArray();
         }
-        $this->zmhttp();
+        if ($options['where']['n5'] === 86) $this->zmhttp();
+        
         return false;
         
     }

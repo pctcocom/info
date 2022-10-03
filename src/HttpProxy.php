@@ -7,19 +7,19 @@ class HttpProxy{
     function __construct(){
         $this->temporary = new Temporary;
     }
-
     public function get($options = []){
         $options = Arrays::merge([],[
             'where'  => [
                 'type'  =>  'httpproxy',
-                'n5'    =>  86
-            ]
+                'n5'    =>  'CHN'
+            ],
+            'order' =>  'timers'
         ],$options);
-        
+
         $ip = 
         $this->temporary
         ->where($options['where'])
-        ->order('timers')
+        ->order($options['order'])
         ->find();
 
         if ($ip !== null) {
@@ -46,7 +46,7 @@ class HttpProxy{
             ]);
             return $ip->toArray();
         }
-        if ($options['where']['n5'] === 86) $this->zmhttp();
+        if ($options['where']['n5'] === 'CHN') $this->zmhttp();
         
         return false;
         
